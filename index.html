@@ -115,7 +115,7 @@
             <label class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow transition">
                 <i class="fa-solid fa-file-pdf"></i>
                 <span class="hidden sm:inline">Open PDF</span>
-                <input type="file" id="fileInput" accept=".pdf,image/*" class="hidden">
+                <input type="file" id="fileInput" accept=".pdf,image/png,image/jpeg,image/webp" class="hidden">
             </label>
 
             <button id="btnLoadSample" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-2.5 py-1.5 rounded-xl flex items-center space-x-1 transition" title="Load Sample Floor Plan">
@@ -129,7 +129,7 @@
         </div>
     </header>
 
-    <!-- MOBILE OBJECT SNAP & SCALE HUD BAR (EXACT DESKTOP STYLE) -->
+    <!-- OBJECT SNAP & SCALE HUD BAR -->
     <div class="h-11 bg-slate-950/95 border-b border-cad-border px-2 flex items-center justify-between z-20 shrink-0 text-xs font-mono overflow-x-auto">
         <div class="flex items-center space-x-1 shrink-0">
             <button id="btnOsnapMaster" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-bold flex items-center space-x-1 shadow-sm transition">
@@ -143,17 +143,21 @@
             <button data-snap="nearest" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]" title="Nearest">NEA</button>
         </div>
 
-        <button id="btnOpenScaleModal" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold flex items-center space-x-1 shrink-0 ml-2">
-            <i class="fa-solid fa-ruler-combined text-[10px]"></i>
-            <span id="scaleButtonText">Smart Scale Setup</span>
-        </button>
+        <div class="flex items-center space-x-1.5 shrink-0 ml-2">
+            <button id="btnZoomOut" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700" title="Zoom Out (-)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+            <button id="btnZoomIn" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700" title="Zoom In (+)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+            <button id="btnOpenScaleModal" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold flex items-center space-x-1">
+                <i class="fa-solid fa-ruler-combined text-[10px]"></i>
+                <span id="scaleButtonText">Smart Scale Setup</span>
+            </button>
+        </div>
     </div>
 
     <!-- MAIN TOUCH CAD VIEWPORT -->
     <main id="viewportContainer" class="flex-1 min-h-0 cad-viewport relative overflow-hidden flex items-center justify-center">
         <canvas id="cadCanvas" class="block"></canvas>
 
-        <!-- FLOATING MAGNIFIER LOUPE (Top Left) -->
+        <!-- FLOATING MAGNIFIER LOUPE -->
         <div id="loupeContainer" class="absolute top-3 left-3 w-28 h-28 rounded-2xl border-2 border-cyan-400/80 bg-slate-950 shadow-2xl overflow-hidden pointer-events-none z-10 hidden sm:block">
             <canvas id="loupeCanvas" width="112" height="112" class="w-full h-full block"></canvas>
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -173,33 +177,37 @@
         </div>
     </main>
 
-    <!-- MOBILE BOTTOM TOOLBAR -->
-    <nav class="h-16 bg-cad-panel border-t border-cad-border px-2 flex items-center justify-around z-30 shrink-0">
-        <button data-tool="pan" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition">
+    <!-- MOBILE BOTTOM TOOLBAR WITH ZOOM WINDOW & CLEAR -->
+    <nav class="h-16 bg-cad-panel border-t border-cad-border px-2 flex items-center justify-around z-30 shrink-0 overflow-x-auto">
+        <button data-tool="pan" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition shrink-0 px-1">
             <i class="fa-solid fa-hand text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Pan</span>
         </button>
-        <button data-tool="calibrate" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-amber-400 transition">
+        <button data-tool="zoom_window" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-cyan-400 transition shrink-0 px-1" title="Select Area to Zoom In">
+            <i class="fa-solid fa-expand text-base mb-0.5"></i>
+            <span class="text-[10px] font-medium">Zoom Win</span>
+        </button>
+        <button data-tool="calibrate" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-amber-400 transition shrink-0 px-1">
             <i class="fa-solid fa-ruler-combined text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Set Scale</span>
         </button>
-        <button data-tool="distance" class="tool-btn active flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-cyan-400 transition">
+        <button data-tool="distance" class="tool-btn active flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-cyan-400 transition shrink-0 px-1">
             <i class="fa-solid fa-arrows-left-right-to-line text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Length</span>
         </button>
-        <button data-tool="polyline" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition">
+        <button data-tool="polyline" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition shrink-0 px-1">
             <i class="fa-solid fa-route text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Wall Run</span>
         </button>
-        <button data-tool="area" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition">
+        <button data-tool="area" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition shrink-0 px-1" title="Measure Area (Tap corners, Double tap to close)">
             <i class="fa-solid fa-draw-polygon text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Area</span>
         </button>
-        <button data-tool="clear" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-rose-400 hover:bg-slate-800 transition">
+        <button data-tool="clear" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-rose-400 hover:bg-slate-800 transition shrink-0 px-1" title="Clear All Measurements">
             <i class="fa-solid fa-trash-can text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Clear</span>
         </button>
-        <button id="btnUndo" class="flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-amber-400 hover:bg-slate-800 transition">
+        <button id="btnUndo" class="flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-amber-400 hover:bg-slate-800 transition shrink-0 px-1">
             <i class="fa-solid fa-rotate-left text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Undo</span>
         </button>
@@ -252,7 +260,7 @@
         </div>
     </div>
 
-    <!-- EXACT DESKTOP SMART SCALE & CALIBRATION MODAL (FEET + INCHES) -->
+    <!-- SMART SCALE & CALIBRATION MODAL -->
     <div id="scaleModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-cad-panel border border-amber-500/50 rounded-2xl max-w-md w-full p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-3 border-b border-cad-border">
@@ -268,7 +276,6 @@
             </div>
 
             <div class="py-4 space-y-4 text-xs">
-                <!-- Preset Ratio Selector -->
                 <div class="space-y-1.5">
                     <label class="font-semibold text-amber-300">1. Select Standard AutoCAD Plot Scale:</label>
                     <select id="presetScaleSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono">
@@ -292,7 +299,6 @@
                     </button>
                 </div>
 
-                <!-- Feet + Inches Separate Inputs -->
                 <div id="calibInputGroup" class="space-y-2 bg-slate-900 p-3 rounded-xl border border-cyan-500/40">
                     <div class="text-cyan-300 font-semibold flex justify-between items-center">
                         <span>Enter Known Dimension:</span>
@@ -322,7 +328,7 @@
         </div>
     </div>
 
-    <!-- MOBILE APPLICATION SCRIPT -->
+    <!-- APPLICATION SCRIPT -->
     <script>
         if (window['pdfjsLib']) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -354,7 +360,8 @@
             activeSnapResult: null,
             measurements: [],
             hoveredId: null,
-            pendingCalibDistPx: 0
+            pendingCalibDistPx: 0,
+            lastTapTime: 0
         };
 
         const canvas = document.getElementById('cadCanvas');
@@ -451,6 +458,24 @@
             drawWorkspace();
         }
 
+        function zoomIn() {
+            zoomAtCenter(1.25);
+        }
+
+        function zoomOut() {
+            zoomAtCenter(0.8);
+        }
+
+        function zoomAtCenter(factor) {
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const newZoom = Math.min(Math.max(state.zoom * factor, 0.2), 10.0);
+            state.panX = cx - (cx - state.panX) * (newZoom / state.zoom);
+            state.panY = cy - (cy - state.panY) * (newZoom / state.zoom);
+            state.zoom = newZoom;
+            drawWorkspace();
+        }
+
         function setupTouchAndMouseEvents() {
             let activeTouches = new Map();
 
@@ -507,7 +532,17 @@
                 for (let touch of e.changedTouches) {
                     if (activeTouches.size === 1 && !state.isPanning) {
                         const rect = canvas.getBoundingClientRect();
-                        handleCanvasTap(screenToPlan(touch.clientX - rect.left, touch.clientY - rect.top));
+                        const rawPt = screenToPlan(touch.clientX - rect.left, touch.clientY - rect.top);
+                        
+                        const now = Date.now();
+                        const isDblTap = (now - state.lastTapTime < 350);
+                        state.lastTapTime = now;
+
+                        if (isDblTap && (state.activeTool === 'area' || state.activeTool === 'polyline')) {
+                            finishPolygonMeasurement();
+                        } else {
+                            handleCanvasTap(rawPt);
+                        }
                     }
                     activeTouches.delete(touch.identifier);
                 }
@@ -520,7 +555,17 @@
                     state.touchStartPan = { x: e.clientX - state.panX, y: e.clientY - state.panY };
                 } else {
                     const rect = canvas.getBoundingClientRect();
-                    handleCanvasTap(screenToPlan(e.clientX - rect.left, e.clientY - rect.top));
+                    const rawPt = screenToPlan(e.clientX - rect.left, e.clientY - rect.top);
+                    
+                    const now = Date.now();
+                    const isDblClick = (now - state.lastTapTime < 350);
+                    state.lastTapTime = now;
+
+                    if (isDblClick && (state.activeTool === 'area' || state.activeTool === 'polyline')) {
+                        finishPolygonMeasurement();
+                    } else {
+                        handleCanvasTap(rawPt);
+                    }
                 }
             });
             canvas.addEventListener('mousemove', (e) => {
@@ -550,6 +595,31 @@
                 return;
             }
 
+            if (state.activeTool === 'zoom_window') {
+                state.currentPoints.push(pt);
+                if (state.currentPoints.length === 2) {
+                    const p1 = state.currentPoints[0];
+                    const p2 = state.currentPoints[1];
+                    const minX = Math.min(p1.x, p2.x);
+                    const maxX = Math.max(p1.x, p2.x);
+                    const minY = Math.min(p1.y, p2.y);
+                    const maxY = Math.max(p1.y, p2.y);
+                    
+                    const boxW = maxX - minX;
+                    const boxH = maxY - minY;
+                    if (boxW > 10 && boxH > 10) {
+                        const zoomX = canvas.width / boxW;
+                        const zoomY = canvas.height / boxH;
+                        state.zoom = Math.min(zoomX, zoomY, 10.0);
+                        state.panX = (canvas.width - (minX + maxX) * state.zoom) / 2;
+                        state.panY = (canvas.height - (minY + maxY) * state.zoom) / 2;
+                    }
+                    state.currentPoints = [];
+                    setActiveTool('distance');
+                }
+                return;
+            }
+
             if (state.activeTool === 'calibrate') {
                 state.currentPoints.push(pt);
                 if (state.currentPoints.length === 2) {
@@ -572,9 +642,41 @@
                     });
                     state.currentPoints = [];
                 }
-            } else if (state.activeTool === 'polyline' || state.activeTool === 'area') {
+            } else if (state.activeTool === 'polyline') {
+                state.currentPoints.push(pt);
+            } else if (state.activeTool === 'area') {
+                if (state.currentPoints.length >= 3) {
+                    const firstPt = state.currentPoints[0];
+                    const distToFirst = Math.hypot(pt.x - firstPt.x, pt.y - firstPt.y);
+                    if (distToFirst < 20 / state.zoom) {
+                        finishPolygonMeasurement();
+                        return;
+                    }
+                }
                 state.currentPoints.push(pt);
             }
+            drawWorkspace();
+        }
+
+        function finishPolygonMeasurement() {
+            if (state.activeTool === 'area' && state.currentPoints.length >= 3) {
+                addMeasurement({
+                    id: Date.now(),
+                    type: 'area',
+                    label: `Area #${state.measurements.length + 1}`,
+                    color: state.activeColor,
+                    points: [...state.currentPoints]
+                });
+            } else if (state.activeTool === 'polyline' && state.currentPoints.length >= 2) {
+                addMeasurement({
+                    id: Date.now(),
+                    type: 'polyline',
+                    label: `Wall Run #${state.measurements.length + 1}`,
+                    color: state.activeColor,
+                    points: [...state.currentPoints]
+                });
+            }
+            state.currentPoints = [];
             drawWorkspace();
         }
 
@@ -647,27 +749,88 @@
 
                 const ft = pixelsToFeet(Math.hypot(item.points[1].x - item.points[0].x, item.points[1].y - item.points[0].y));
                 drawBadge((pts[0].x + pts[1].x) / 2, (pts[0].y + pts[1].y) / 2 - 14, formatLength(ft), item.color);
+            } else if (item.type === 'polyline') {
+                ctx.beginPath();
+                pts.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
+                ctx.stroke();
+            } else if (item.type === 'area') {
+                ctx.beginPath();
+                pts.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
+                ctx.closePath();
+                ctx.fillStyle = hexToRgba(item.color, 0.2);
+                ctx.fill();
+                ctx.stroke();
+
+                let areaPx = 0;
+                for (let i = 0; i < item.points.length; i++) {
+                    const j = (i + 1) % item.points.length;
+                    areaPx += item.points[i].x * item.points[j].y;
+                    areaPx -= item.points[j].x * item.points[i].y;
+                }
+                const sqFt = Math.abs(areaPx) / 2.0 / (state.pixelsPerFoot * state.pixelsPerFoot);
+                const cx = pts.reduce((acc, p) => acc + p.x, 0) / pts.length;
+                const cy = pts.reduce((acc, p) => acc + p.y, 0) / pts.length;
+                drawBadge(cx, cy, formatArea(sqFt), item.color);
             }
             ctx.restore();
         }
 
         function drawActivePreview() {
+            if (state.activeTool === 'zoom_window' && state.currentPoints.length === 1) {
+                const p1 = planToScreen(state.currentPoints[0].x, state.currentPoints[0].y);
+                const cur = planToScreen(state.mousePlanPos.x, state.mousePlanPos.y);
+                ctx.save();
+                ctx.strokeStyle = '#00e5ff';
+                ctx.fillStyle = 'rgba(0, 229, 255, 0.15)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+                ctx.fillRect(p1.x, p1.y, cur.x - p1.x, cur.y - p1.y);
+                ctx.strokeRect(p1.x, p1.y, cur.x - p1.x, cur.y - p1.y);
+                ctx.restore();
+                return;
+            }
+
             const snapped = getSnappedPoint(state.mousePlanPos);
             const curSc = planToScreen(snapped.x, snapped.y);
-            const p1 = planToScreen(state.currentPoints[0].x, state.currentPoints[0].y);
+            const pts = state.currentPoints.map(p => planToScreen(p.x, p.y));
 
             ctx.save();
             ctx.strokeStyle = state.activeColor;
             ctx.lineWidth = 2;
             ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(curSc.x, curSc.y);
-            ctx.stroke();
-            ctx.restore();
 
-            const ft = pixelsToFeet(Math.hypot(snapped.x - state.currentPoints[0].x, snapped.y - state.currentPoints[0].y));
-            drawBadge((p1.x + curSc.x) / 2, (p1.y + curSc.y) / 2 - 14, formatLength(ft), state.activeColor);
+            if (state.activeTool === 'distance' || state.activeTool === 'calibrate') {
+                const p1 = pts[0];
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(curSc.x, curSc.y);
+                ctx.stroke();
+                const ft = pixelsToFeet(Math.hypot(snapped.x - state.currentPoints[0].x, snapped.y - state.currentPoints[0].y));
+                drawBadge((p1.x + curSc.x) / 2, (p1.y + curSc.y) / 2 - 14, formatLength(ft), state.activeColor);
+            } else if (state.activeTool === 'polyline' || state.activeTool === 'area') {
+                ctx.beginPath();
+                pts.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
+                ctx.lineTo(curSc.x, curSc.y);
+                if (state.activeTool === 'area' && pts.length >= 2) {
+                    ctx.closePath();
+                    ctx.fillStyle = hexToRgba(state.activeColor, 0.15);
+                    ctx.fill();
+                }
+                ctx.stroke();
+
+                if (state.activeTool === 'area' && pts.length >= 2) {
+                    const tempPts = [...state.currentPoints, snapped];
+                    let areaPx = 0;
+                    for (let i = 0; i < tempPts.length; i++) {
+                        const j = (i + 1) % tempPts.length;
+                        areaPx += tempPts[i].x * tempPts[j].y;
+                        areaPx -= tempPts[j].x * tempPts[i].y;
+                    }
+                    const sqFt = Math.abs(areaPx) / 2.0 / (state.pixelsPerFoot * state.pixelsPerFoot);
+                    drawBadge(curSc.x + 15, curSc.y - 15, formatArea(sqFt), state.activeColor);
+                }
+            }
+            ctx.restore();
         }
 
         function drawBadge(x, y, text, color) {
@@ -715,6 +878,15 @@
             return `${sqFt.toFixed(2)} sq.ft`;
         }
 
+        function setActiveTool(tool) {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`[data-tool="${tool}"]`);
+            if (btn) btn.classList.add('active');
+            state.activeTool = tool;
+            state.currentPoints = [];
+            vibrateDevice();
+        }
+
         function setupUIListeners() {
             document.querySelectorAll('.tool-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -730,12 +902,64 @@
                         vibrateDevice();
                         return;
                     }
-                    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    state.activeTool = tool;
-                    state.currentPoints = [];
-                    vibrateDevice();
+                    setActiveTool(tool);
                 });
+            });
+
+            document.getElementById('btnZoomIn').addEventListener('click', zoomIn);
+            document.getElementById('btnZoomOut').addEventListener('click', zoomOut);
+
+            document.getElementById('fileInput').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+                    const reader = new FileReader();
+                    reader.onload = async function () {
+                        try {
+                            const typedarray = new Uint8Array(this.result);
+                            const loadingTask = pdfjsLib.getDocument({ data: typedarray });
+                            const pdfDoc = await loadingTask.promise;
+                            const page = await pdfDoc.getPage(1);
+                            const viewportPDF = page.getViewport({ scale: 2.0 });
+                            
+                            state.planCanvas.width = viewportPDF.width;
+                            state.planCanvas.height = viewportPDF.height;
+                            const pCtx = state.planCanvas.getContext('2d');
+                            await page.render({ canvasContext: pCtx, viewport: viewportPDF }).promise;
+
+                            state.planLoaded = true;
+                            fitPlanToScreen();
+                            state.scaleLabel = 'Uploaded PDF (Scale: 1:100)';
+                            updateTopScaleText();
+                        } catch (err) {
+                            console.error('PDF Read Error:', err);
+                            alert('Could not read PDF. Loading sample plan instead.');
+                            generateSampleMobileFloorPlan();
+                        }
+                    };
+                    reader.onerror = function() {
+                        generateSampleMobileFloorPlan();
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (evt) {
+                        const img = new Image();
+                        img.onload = function () {
+                            state.planCanvas.width = img.width;
+                            state.planCanvas.height = img.height;
+                            const pCtx = state.planCanvas.getContext('2d');
+                            pCtx.drawImage(img, 0, 0);
+                            state.planLoaded = true;
+                            fitPlanToScreen();
+                            state.scaleLabel = 'Uploaded Image Scale';
+                            updateTopScaleText();
+                        };
+                        img.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
 
             document.getElementById('btnOsnapMaster').addEventListener('click', () => {
@@ -839,30 +1063,58 @@
             const listEl = document.getElementById('drawerItemsList');
             listEl.innerHTML = '';
             let totalLen = 0;
+            let totalArea = 0;
 
             state.measurements.forEach(item => {
-                const ft = pixelsToFeet(Math.hypot(item.points[1].x - item.points[0].x, item.points[1].y - item.points[0].y));
-                totalLen += ft;
-
                 const card = document.createElement('div');
                 card.className = 'bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between';
-                card.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <span class="w-3 h-3 rounded-full" style="background:${item.color}"></span>
-                        <div>
-                            <div class="font-bold text-white text-xs">${item.label}</div>
-                            <div class="font-mono text-cyan-400 text-sm mt-0.5">${formatLength(ft)}</div>
+                
+                if (item.type === 'distance' || item.type === 'polyline') {
+                    const ft = pixelsToFeet(
+                        item.type === 'distance' 
+                        ? Math.hypot(item.points[1].x - item.points[0].x, item.points[1].y - item.points[0].y)
+                        : item.points.reduce((acc, p, idx, arr) => idx === 0 ? 0 : acc + Math.hypot(p.x - arr[idx-1].x, p.y - arr[idx-1].y), 0)
+                    );
+                    totalLen += ft;
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full" style="background:${item.color}"></span>
+                            <div>
+                                <div class="font-bold text-white text-xs">${item.label}</div>
+                                <div class="font-mono text-cyan-400 text-sm mt-0.5">${formatLength(ft)}</div>
+                            </div>
                         </div>
-                    </div>
-                    <button class="text-slate-500 hover:text-rose-400 p-1" onclick="deleteMeasurement(${item.id})">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
-                    </button>
-                `;
+                        <button class="text-slate-500 hover:text-rose-400 p-1" onclick="deleteMeasurement(${item.id})">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    `;
+                } else if (item.type === 'area') {
+                    let areaPx = 0;
+                    for (let i = 0; i < item.points.length; i++) {
+                        const j = (i + 1) % item.points.length;
+                        areaPx += item.points[i].x * item.points[j].y;
+                        areaPx -= item.points[j].x * item.points[i].y;
+                    }
+                    const sqFt = Math.abs(areaPx) / 2.0 / (state.pixelsPerFoot * state.pixelsPerFoot);
+                    totalArea += sqFt;
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full" style="background:${item.color}"></span>
+                            <div>
+                                <div class="font-bold text-white text-xs">${item.label}</div>
+                                <div class="font-mono text-emerald-400 text-sm mt-0.5">${formatArea(sqFt)}</div>
+                            </div>
+                        </div>
+                        <button class="text-slate-500 hover:text-rose-400 p-1" onclick="deleteMeasurement(${item.id})">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    `;
+                }
                 listEl.appendChild(card);
             });
 
             document.getElementById('drawerTotalLength').textContent = formatLength(totalLen);
-            document.getElementById('drawerTotalArea').textContent = formatArea(totalLen * 2);
+            document.getElementById('drawerTotalArea').textContent = formatArea(totalArea);
         }
 
         function deleteMeasurement(id) {
@@ -870,6 +1122,14 @@
             document.getElementById('badgeCount').textContent = state.measurements.length;
             updateDrawerList();
             drawWorkspace();
+        }
+
+        function hexToRgba(hex, alpha) {
+            const clean = hex.replace('#', '');
+            const r = parseInt(clean.substring(0, 2), 16) || 0;
+            const g = parseInt(clean.substring(2, 4), 16) || 229;
+            const b = parseInt(clean.substring(4, 6), 16) || 255;
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         }
     </script>
 </body>
