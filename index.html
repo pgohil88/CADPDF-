@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CADMeasure Mobile - AutoCAD PDF Takeoff & Measurement</title>
+    <title>CADMeasure Mobile Pro - AutoCAD PDF Takeoff & OSNAP</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- PDF.js CDN -->
@@ -27,10 +27,10 @@
                             bg: '#070a0f',
                             panel: '#111827',
                             border: '#1f2937',
-                            accent: '#06b6d4',
-                            amber: '#f59e0b',
-                            green: '#10b981',
-                            pink: '#ec4899'
+                            accent: '#00e5ff',
+                            amber: '#ffb300',
+                            green: '#00e676',
+                            pink: '#ff4081'
                         }
                     }
                 }
@@ -39,7 +39,6 @@
     </script>
 
     <style>
-        /* Prevent bounce/overscroll on mobile browsers */
         html, body {
             height: 100%;
             height: 100dvh;
@@ -61,7 +60,6 @@
             background-size: 30px 30px;
         }
 
-        /* Custom Scrollbars */
         ::-webkit-scrollbar {
             width: 4px;
             height: 4px;
@@ -75,19 +73,18 @@
         }
 
         .tool-btn.active {
-            background-color: rgba(6, 182, 212, 0.2);
-            border-color: #06b6d4;
-            color: #06b6d4;
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+            background-color: rgba(0, 229, 255, 0.2);
+            border-color: #00e5ff;
+            color: #00e5ff;
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
         }
 
         .osnap-pill.active {
-            background-color: rgba(16, 185, 129, 0.25);
-            border-color: #10b981;
-            color: #10b981;
+            background-color: rgba(0, 230, 118, 0.25);
+            border-color: #00e676;
+            color: #00e676;
         }
 
-        /* Smooth slide-up bottom sheets */
         .bottom-sheet {
             transform: translateY(100%);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -107,28 +104,24 @@
             </div>
             <div>
                 <h1 class="font-bold text-white text-xs tracking-tight flex items-center space-x-1">
-                    <span>CADMeasure</span>
+                    <span>CADMeasure Pro</span>
                     <span class="text-[9px] font-mono px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">MOBILE</span>
                 </h1>
                 <p id="topScaleStatus" class="text-[10px] text-amber-400 font-mono">Scale: 1:100 (Tap to Setup)</p>
             </div>
         </div>
 
-        <!-- Right Quick Actions -->
         <div class="flex items-center space-x-2">
-            <!-- Open File Button -->
-            <label class="cursor-pointer bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow transition">
+            <label class="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow transition">
                 <i class="fa-solid fa-file-pdf"></i>
                 <span class="hidden sm:inline">Open PDF</span>
                 <input type="file" id="fileInput" accept=".pdf,image/*" class="hidden">
             </label>
 
-            <!-- Sample Plan Button -->
             <button id="btnLoadSample" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-2.5 py-1.5 rounded-xl flex items-center space-x-1 transition" title="Load Sample Floor Plan">
                 <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
             </button>
 
-            <!-- Menu / Report Drawer Button -->
             <button id="btnOpenDrawer" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-xs px-2.5 py-1.5 rounded-xl flex items-center space-x-1 transition relative">
                 <i class="fa-solid fa-list-check"></i>
                 <span id="badgeCount" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-cyan-500 text-slate-950 font-bold text-[9px] flex items-center justify-center">2</span>
@@ -136,24 +129,23 @@
         </div>
     </header>
 
-    <!-- PROMINENT MOBILE OSNAP & SCALE BAR (RIGHT UNDER HEADER) -->
-    <div class="h-10 bg-slate-950/95 border-b border-cad-border px-2 flex items-center justify-between z-20 shrink-0 text-xs font-mono overflow-x-auto">
-        <!-- Object Snap Master & Quick Pills -->
+    <!-- MOBILE OBJECT SNAP & SCALE HUD BAR (EXACT DESKTOP STYLE) -->
+    <div class="h-11 bg-slate-950/95 border-b border-cad-border px-2 flex items-center justify-between z-20 shrink-0 text-xs font-mono overflow-x-auto">
         <div class="flex items-center space-x-1 shrink-0">
             <button id="btnOsnapMaster" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-bold flex items-center space-x-1 shadow-sm transition">
                 <i class="fa-solid fa-magnet text-[11px]"></i>
                 <span id="osnapMasterText">OSNAP: ON</span>
             </button>
-            <button data-snap="endpoint" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]">END</button>
-            <button data-snap="midpoint" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]">MID</button>
-            <button data-snap="intersection" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]">INT</button>
-            <button data-snap="nearest" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]">NEA</button>
+            <button data-snap="endpoint" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]" title="Endpoint">END</button>
+            <button data-snap="midpoint" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]" title="Midpoint">MID</button>
+            <button data-snap="intersection" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]" title="Intersection">INT</button>
+            <button data-snap="perpendicular" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]" title="Perpendicular">PER</button>
+            <button data-snap="nearest" class="osnap-pill active px-1.5 py-0.5 rounded border border-slate-800 bg-slate-900 text-[10px]" title="Nearest">NEA</button>
         </div>
 
-        <!-- Scale Manager Trigger Button -->
         <button id="btnOpenScaleModal" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold flex items-center space-x-1 shrink-0 ml-2">
             <i class="fa-solid fa-ruler-combined text-[10px]"></i>
-            <span id="scaleButtonText">Scale Setup</span>
+            <span id="scaleButtonText">Smart Scale Setup</span>
         </button>
     </div>
 
@@ -174,47 +166,40 @@
             </div>
         </div>
 
-        <!-- FLOATING PROMPT BANNER (Bottom of Canvas) -->
+        <!-- FLOATING PROMPT BANNER -->
         <div id="promptBanner" class="absolute bottom-16 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur border border-cyan-500/30 text-slate-200 px-3 py-1.5 rounded-full shadow-lg text-[11px] pointer-events-none z-10 whitespace-nowrap">
             <i class="fa-solid fa-circle-info text-cyan-400 mr-1"></i>
-            <span id="promptText">Tap corners of wall or line to measure length.</span>
+            <span id="promptText">Tap wall corners with OSNAP for exact measurement.</span>
         </div>
     </main>
 
-    <!-- MOBILE BOTTOM TOOLBAR (TOUCH OPTIMIZED) -->
+    <!-- MOBILE BOTTOM TOOLBAR -->
     <nav class="h-16 bg-cad-panel border-t border-cad-border px-2 flex items-center justify-around z-30 shrink-0">
-        <!-- Pan / Navigate -->
         <button data-tool="pan" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition">
             <i class="fa-solid fa-hand text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Pan</span>
         </button>
-
-        <!-- Set Scale / Calibrate -->
         <button data-tool="calibrate" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-amber-400 transition">
             <i class="fa-solid fa-ruler-combined text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Set Scale</span>
         </button>
-
-        <!-- Distance / Length -->
         <button data-tool="distance" class="tool-btn active flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-cyan-400 transition">
             <i class="fa-solid fa-arrows-left-right-to-line text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Length</span>
         </button>
-
-        <!-- Polyline / Wall Run -->
         <button data-tool="polyline" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition">
             <i class="fa-solid fa-route text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Wall Run</span>
         </button>
-
-        <!-- Area Polygon -->
         <button data-tool="area" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-slate-400 transition">
             <i class="fa-solid fa-draw-polygon text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Area</span>
         </button>
-
-        <!-- Undo Last Point -->
-        <button id="btnUndo" class="flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-rose-400 hover:bg-slate-800 transition">
+        <button data-tool="clear" class="tool-btn flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-rose-400 hover:bg-slate-800 transition">
+            <i class="fa-solid fa-trash-can text-base mb-0.5"></i>
+            <span class="text-[10px] font-medium">Clear</span>
+        </button>
+        <button id="btnUndo" class="flex-1 py-1 rounded-xl flex flex-col items-center justify-center text-amber-400 hover:bg-slate-800 transition">
             <i class="fa-solid fa-rotate-left text-base mb-0.5"></i>
             <span class="text-[10px] font-medium">Undo</span>
         </button>
@@ -222,16 +207,18 @@
 
     <!-- MEASUREMENTS LIST & REPORT SLIDE-UP DRAWER -->
     <div id="measureDrawer" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-end justify-center">
-        <div class="bg-cad-panel border-t-2 border-cyan-500 rounded-t-3xl w-full max-w-xl max-h-[82vh] flex flex-col shadow-2xl overflow-hidden">
-            <!-- Drawer Handle & Header -->
+        <div class="bottom-sheet bg-cad-panel border-t-2 border-cyan-500 rounded-t-3xl w-full max-w-xl max-h-[82vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-3.5 border-b border-cad-border flex items-center justify-between shrink-0">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-list-check text-cyan-400"></i>
                     <h3 class="font-bold text-white text-sm">Takeoff Measurements List</h3>
                 </div>
                 <div class="flex items-center space-x-2">
+                    <button id="btnClearAll" class="text-xs bg-rose-500/20 text-rose-300 px-2.5 py-1 rounded-lg border border-rose-500/40 font-medium" title="Clear All Measurements">
+                        <i class="fa-solid fa-trash-can mr-1"></i>Clear All
+                    </button>
                     <button id="btnExportCSV" class="text-xs bg-slate-800 text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-500/30">
-                        <i class="fa-solid fa-file-csv mr-1"></i>Excel CSV
+                        <i class="fa-solid fa-file-csv mr-1"></i>CSV
                     </button>
                     <button id="btnCloseDrawer" class="text-slate-400 hover:text-white px-2 py-1">
                         <i class="fa-solid fa-xmark text-lg"></i>
@@ -239,7 +226,6 @@
                 </div>
             </div>
 
-            <!-- Summary Totals Cards -->
             <div class="grid grid-cols-2 gap-2 p-3 bg-slate-900/80 border-b border-cad-border shrink-0">
                 <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5">
                     <span class="text-[10px] text-slate-400 uppercase">Total Length</span>
@@ -251,12 +237,8 @@
                 </div>
             </div>
 
-            <!-- Items List -->
-            <div id="drawerItemsList" class="flex-1 overflow-y-auto p-3 space-y-2.5">
-                <!-- Dynamically populated -->
-            </div>
+            <div id="drawerItemsList" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
 
-            <!-- Footer Unit Switcher -->
             <div class="p-3 bg-slate-950 border-t border-cad-border flex items-center justify-between shrink-0">
                 <span class="text-xs text-slate-400">Display Units:</span>
                 <select id="unitSelect" class="bg-slate-800 text-cyan-300 font-mono text-xs border border-slate-700 rounded-lg px-2 py-1.5 focus:outline-none">
@@ -270,15 +252,15 @@
         </div>
     </div>
 
-    <!-- SMART SCALE & CALIBRATION MODAL -->
-    <div id="scaleModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <!-- EXACT DESKTOP SMART SCALE & CALIBRATION MODAL (FEET + INCHES) -->
+    <div id="scaleModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-cad-panel border border-amber-500/50 rounded-2xl max-w-md w-full p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between pb-3 border-b border-cad-border">
                 <div class="flex items-center space-x-2">
                     <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center">
                         <i class="fa-solid fa-ruler-combined"></i>
                     </div>
-                    <h3 class="font-bold text-white text-sm">Smart Scale & Calibration</h3>
+                    <h3 class="font-bold text-white text-sm">Smart Scale & Calibration Manager</h3>
                 </div>
                 <button id="btnCloseScaleModal" class="text-slate-400 hover:text-white">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -286,7 +268,7 @@
             </div>
 
             <div class="py-4 space-y-4 text-xs">
-                <!-- Method 1: Preset Ratio -->
+                <!-- Preset Ratio Selector -->
                 <div class="space-y-1.5">
                     <label class="font-semibold text-amber-300">1. Select Standard AutoCAD Plot Scale:</label>
                     <select id="presetScaleSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-white font-mono">
@@ -298,40 +280,43 @@
                         <option value="50">1 : 50 (Metric)</option>
                         <option value="100" selected>1 : 100 (Standard Plan)</option>
                         <option value="200">1 : 200 (Site Plan)</option>
-                        <option value="500">1 : 500 (Master Plan)</option>
                     </select>
                 </div>
 
                 <div class="border-t border-cad-border pt-3 space-y-2">
-                    <label class="font-semibold text-cyan-300">2. Or 2-Point Line Calibration (कस्टम नाap):</label>
-                    <p class="text-[11px] text-slate-400">Click 2 points on a known wall on your PDF, then enter its true length in feet & inches below:</p>
+                    <label class="font-semibold text-cyan-300">2. Or 2-Point Line Calibration (कस्टम नाप):</label>
+                    <p class="text-[11px] text-slate-400">Tap 2 points on a known wall on your PDF, then enter its true feet & inches below:</p>
                     <button id="btnStart2PtCalib" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-crosshairs"></i>
                         <span>Pick 2 Points on Drawing</span>
                     </button>
                 </div>
 
-                <div id="calibInputGroup" class="hidden space-y-2 bg-slate-900 p-3 rounded-xl border border-cyan-500/40">
-                    <div class="text-cyan-300 font-semibold">Enter Known Dimension:</div>
+                <!-- Feet + Inches Separate Inputs -->
+                <div id="calibInputGroup" class="space-y-2 bg-slate-900 p-3 rounded-xl border border-cyan-500/40">
+                    <div class="text-cyan-300 font-semibold flex justify-between items-center">
+                        <span>Enter Known Dimension:</span>
+                        <span id="calibPixelInfo" class="text-[10px] font-mono text-slate-400">Clicked: 0.0 px</span>
+                    </div>
                     <div class="grid grid-cols-2 gap-2">
-                        <div class="flex items-center bg-slate-800 px-3 py-1.5 rounded-lg">
+                        <div class="flex items-center bg-slate-800 px-3 py-1.5 rounded-xl">
                             <input type="number" id="calibFeet" value="10" class="w-full bg-transparent text-white font-mono text-base focus:outline-none">
-                            <span class="text-slate-400 ml-1">ft</span>
+                            <span class="text-amber-300 ml-1">Feet (')</span>
                         </div>
-                        <div class="flex items-center bg-slate-800 px-3 py-1.5 rounded-lg">
+                        <div class="flex items-center bg-slate-800 px-3 py-1.5 rounded-xl">
                             <input type="number" id="calibInches" value="0" class="w-full bg-transparent text-white font-mono text-base focus:outline-none">
-                            <span class="text-slate-400 ml-1">in</span>
+                            <span class="text-cyan-300 ml-1">Inches (")</span>
                         </div>
                     </div>
-                    <button id="btnApplyCalib" class="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition">
-                        Confirm & Save Scale
-                    </button>
                 </div>
             </div>
 
-            <div class="pt-3 border-t border-cad-border flex justify-end">
-                <button id="btnSaveScaleModal" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
-                    Apply Scale
+            <div class="pt-3 border-t border-cad-border flex justify-end space-x-2">
+                <button id="btnApplyPreset" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+                    Apply Preset Scale
+                </button>
+                <button id="btnApply2PtCalib" class="hidden px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs">
+                    Apply 2-Point Scale
                 </button>
             </div>
         </div>
@@ -339,7 +324,6 @@
 
     <!-- MOBILE APPLICATION SCRIPT -->
     <script>
-        // PDF.js worker setup
         if (window['pdfjsLib']) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
@@ -348,32 +332,25 @@
             planCanvas: document.createElement('canvas'),
             planLoaded: false,
             
-            // Viewport Pinch & Pan state
             zoom: 1.0,
             panX: 20,
             panY: 20,
             isPanning: false,
             lastTouchDist: 0,
-            lastTouchCenter: { x: 0, y: 0 },
-            touchStartPan: { x: 0, y: 0 },
 
-            // Scale
             pixelsPerFoot: 20.0,
             canvasPixelsPerPaperInch: 144.0,
             scaleLabel: '1:100 (Default)',
             displayUnit: 'ft-in',
 
-            // Tools
-            activeTool: 'distance', // 'pan', 'calibrate', 'distance', 'polyline', 'area'
-            activeColor: '#06b6d4',
+            activeTool: 'distance',
+            activeColor: '#00e5ff',
             osnapEnabled: true,
-            osnapModes: { endpoint: true, midpoint: true, intersection: true, nearest: true },
+            osnapModes: { endpoint: true, midpoint: true, intersection: true, perpendicular: true, nearest: true },
 
-            // Drawing data
             currentPoints: [],
             mousePlanPos: { x: 0, y: 0 },
             vectorSegments: [],
-            vectorIntersections: [],
             activeSnapResult: null,
             measurements: [],
             hoveredId: null,
@@ -402,17 +379,12 @@
         }
 
         function vibrateDevice() {
-            if (navigator.vibrate) {
-                navigator.vibrate(35);
-            }
+            if (navigator.vibrate) navigator.vibrate(35);
         }
 
-        // --- BUILT-IN SAMPLE FLOOR PLAN ---
         function generateSampleMobileFloorPlan() {
             state.vectorSegments = [];
-            state.vectorIntersections = [];
-
-            const w = 1000;
+            const w = 1100;
             const h = 800;
             state.planCanvas.width = w;
             state.planCanvas.height = h;
@@ -434,14 +406,12 @@
             pCtx.strokeStyle = '#0f172a';
             pCtx.lineWidth = 3;
 
-            // Outer walls 32x24
             pCtx.strokeRect(ox, oy, 32 * ft, 24 * ft);
             addSeg(ox, oy, ox + 32 * ft, oy);
             addSeg(ox + 32 * ft, oy, ox + 32 * ft, oy + 24 * ft);
             addSeg(ox + 32 * ft, oy + 24 * ft, ox, oy + 24 * ft);
             addSeg(ox, oy + 24 * ft, ox, oy);
 
-            // Inner partition
             pCtx.beginPath();
             pCtx.moveTo(ox + 14 * ft, oy); pCtx.lineTo(ox + 14 * ft, oy + 24 * ft);
             pCtx.moveTo(ox, oy + 12 * ft); pCtx.lineTo(ox + 14 * ft, oy + 12 * ft);
@@ -449,8 +419,7 @@
             addSeg(ox + 14 * ft, oy, ox + 14 * ft, oy + 24 * ft);
             addSeg(ox, oy + 12 * ft, ox + 14 * ft, oy + 12 * ft);
 
-            // Room text labels
-            pCtx.font = 'bold 16px Inter, sans-serif';
+            pCtx.font = 'bold 15px Inter, sans-serif';
             pCtx.fillStyle = '#0f172a';
             pCtx.fillText('BEDROOM (14\' × 12\')', ox + 2 * ft, oy + 6 * ft);
             pCtx.fillText('KITCHEN (14\' × 12\')', ox + 2 * ft, oy + 18 * ft);
@@ -464,7 +433,7 @@
                     id: Date.now(),
                     type: 'distance',
                     label: 'Bed Room Width',
-                    color: '#06b6d4',
+                    color: '#00e5ff',
                     points: [{ x: ox, y: oy }, { x: ox + 14 * ft, y: oy }]
                 }
             ];
@@ -482,7 +451,6 @@
             drawWorkspace();
         }
 
-        // --- TOUCH & MOUSE EVENT HANDLERS FOR MOBILE ---
         function setupTouchAndMouseEvents() {
             let activeTouches = new Map();
 
@@ -493,10 +461,8 @@
                 }
 
                 if (activeTouches.size === 2) {
-                    // Pinch zoom start
                     const pts = Array.from(activeTouches.values());
                     state.lastTouchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-                    state.lastTouchCenter = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
                 } else if (activeTouches.size === 1 && state.activeTool === 'pan') {
                     state.isPanning = true;
                     const t = Array.from(activeTouches.values())[0];
@@ -511,7 +477,6 @@
                 }
 
                 if (activeTouches.size === 2) {
-                    // Pinch zoom & pan
                     const pts = Array.from(activeTouches.values());
                     const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
                     const center = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
@@ -522,9 +487,7 @@
                     state.panX = center.x - (center.x - state.panX) * (newZoom / state.zoom);
                     state.panY = center.y - (center.y - state.panY) * (newZoom / state.zoom);
                     state.zoom = newZoom;
-
                     state.lastTouchDist = dist;
-                    state.lastTouchCenter = center;
                     drawWorkspace();
                 } else if (activeTouches.size === 1 && state.isPanning) {
                     const t = Array.from(activeTouches.values())[0];
@@ -534,9 +497,7 @@
                 } else if (activeTouches.size === 1) {
                     const t = Array.from(activeTouches.values())[0];
                     const rect = canvas.getBoundingClientRect();
-                    const sx = t.clientX - rect.left;
-                    const sy = t.clientY - rect.top;
-                    state.mousePlanPos = screenToPlan(sx, sy);
+                    state.mousePlanPos = screenToPlan(t.clientX - rect.left, t.clientY - rect.top);
                     drawWorkspace();
                 }
             }, { passive: false });
@@ -545,22 +506,16 @@
                 e.preventDefault();
                 for (let touch of e.changedTouches) {
                     if (activeTouches.size === 1 && !state.isPanning) {
-                        // Single tap interaction
                         const rect = canvas.getBoundingClientRect();
-                        const sx = touch.clientX - rect.left;
-                        const sy = touch.clientY - rect.top;
-                        handleCanvasTap(screenToPlan(sx, sy));
+                        handleCanvasTap(screenToPlan(touch.clientX - rect.left, touch.clientY - rect.top));
                     }
                     activeTouches.delete(touch.identifier);
                 }
-                if (activeTouches.size === 0) {
-                    state.isPanning = false;
-                }
+                if (activeTouches.size === 0) state.isPanning = false;
             }, { passive: false });
 
-            // Desktop Mouse support for testing in browser
             canvas.addEventListener('mousedown', (e) => {
-                if (e.button === 1 || e.button === 2 || state.activeTool === 'pan') {
+                if (e.button === 2 || state.activeTool === 'pan') {
                     state.isPanning = true;
                     state.touchStartPan = { x: e.clientX - state.panX, y: e.clientY - state.panY };
                 } else {
@@ -570,9 +525,7 @@
             });
             canvas.addEventListener('mousemove', (e) => {
                 const rect = canvas.getBoundingClientRect();
-                const sx = e.clientX - rect.left;
-                const sy = e.clientY - rect.top;
-                state.mousePlanPos = screenToPlan(sx, sy);
+                state.mousePlanPos = screenToPlan(e.clientX - rect.left, e.clientY - rect.top);
                 if (state.isPanning) {
                     state.panX = e.clientX - state.touchStartPan.x;
                     state.panY = e.clientY - state.touchStartPan.y;
@@ -586,14 +539,26 @@
             vibrateDevice();
             const pt = getSnappedPoint(rawPlanPt);
 
+            if (state.activeTool === 'clear') {
+                if (state.measurements.length > 0) {
+                    state.measurements = [];
+                    state.currentPoints = [];
+                    document.getElementById('badgeCount').textContent = '0';
+                    updateDrawerList();
+                    drawWorkspace();
+                }
+                return;
+            }
+
             if (state.activeTool === 'calibrate') {
                 state.currentPoints.push(pt);
                 if (state.currentPoints.length === 2) {
-                    const pxDist = Math.hypot(state.currentPoints[1].x - state.currentPoints[0].x, state.currentPoints[1].y - state.currentPoints[0].y);
-                    state.pendingCalibDistPx = pxDist;
+                    state.pendingCalibDistPx = Math.hypot(state.currentPoints[1].x - state.currentPoints[0].x, state.currentPoints[1].y - state.currentPoints[0].y);
+                    document.getElementById('calibPixelInfo').textContent = `Clicked: ${state.pendingCalibDistPx.toFixed(1)} px`;
+                    document.getElementById('btnApplyPreset').classList.add('hidden');
+                    document.getElementById('btnApply2PtCalib').classList.remove('hidden');
                     document.getElementById('scaleModal').classList.remove('hidden');
                     document.getElementById('scaleModal').classList.add('flex');
-                    document.getElementById('calibInputGroup').classList.remove('hidden');
                 }
             } else if (state.activeTool === 'distance') {
                 state.currentPoints.push(pt);
@@ -615,12 +580,11 @@
 
         function getSnappedPoint(rawPlanPt) {
             if (!state.osnapEnabled) return rawPlanPt;
-            const maxDist = 25 / state.zoom;
+            const maxDist = 35 / state.zoom;
             let best = null;
             let minDist = Infinity;
 
             state.vectorSegments.forEach(seg => {
-                // Endpoint checks
                 const d1 = Math.hypot(seg.x1 - rawPlanPt.x, seg.y1 - rawPlanPt.y);
                 if (d1 < maxDist && d1 < minDist && state.osnapModes.endpoint) {
                     minDist = d1; best = { x: seg.x1, y: seg.y1, type: 'END' };
@@ -629,7 +593,6 @@
                 if (d2 < maxDist && d2 < minDist && state.osnapModes.endpoint) {
                     minDist = d2; best = { x: seg.x2, y: seg.y2, type: 'END' };
                 }
-                // Midpoint check
                 const mx = (seg.x1 + seg.x2) / 2;
                 const my = (seg.y1 + seg.y2) / 2;
                 const dm = Math.hypot(mx - rawPlanPt.x, my - rawPlanPt.y);
@@ -642,7 +605,6 @@
             return best ? { x: best.x, y: best.y } : rawPlanPt;
         }
 
-        // --- RENDER LOOP & DRAWING ---
         function renderLoop() {
             drawWorkspace();
             requestAnimationFrame(renderLoop);
@@ -658,22 +620,15 @@
             ctx.drawImage(state.planCanvas, 0, 0);
             ctx.restore();
 
-            // Draw recorded measurements
-            state.measurements.forEach(item => {
-                drawMeasurementItem(item, item.id === state.hoveredId);
-            });
+            state.measurements.forEach(item => drawMeasurementItem(item, item.id === state.hoveredId));
 
-            // Draw in-progress preview
-            if (state.currentPoints.length > 0) {
-                drawActivePreview();
-            }
+            if (state.currentPoints.length > 0) drawActivePreview();
 
-            // Draw snap indicator
             if (state.osnapEnabled && state.activeSnapResult) {
                 const sc = planToScreen(state.activeSnapResult.x, state.activeSnapResult.y);
-                ctx.strokeStyle = '#10b981';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(sc.x - 8, sc.y - 8, 16, 16);
+                ctx.strokeStyle = '#00e676';
+                ctx.lineWidth = 2.5;
+                ctx.strokeRect(sc.x - 9, sc.y - 9, 18, 18);
             }
         }
 
@@ -740,9 +695,7 @@
         function planToScreen(px, py) {
             return { x: px * state.zoom + state.panX, y: py * state.zoom + state.panY };
         }
-        function pixelsToFeet(px) {
-            return px / state.pixelsPerFoot;
-        }
+        function pixelsToFeet(px) { return px / state.pixelsPerFoot; }
 
         function formatLength(ft) {
             if (state.displayUnit === 'ft-in') {
@@ -762,31 +715,44 @@
             return `${sqFt.toFixed(2)} sq.ft`;
         }
 
-        // --- UI & DRAWER MANAGEMENT ---
         function setupUIListeners() {
-            // Toolbar buttons
             document.querySelectorAll('.tool-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
+                    const tool = btn.dataset.tool;
+                    if (tool === 'clear') {
+                        if (state.measurements.length > 0) {
+                            state.measurements = [];
+                            state.currentPoints = [];
+                            document.getElementById('badgeCount').textContent = '0';
+                            updateDrawerList();
+                            drawWorkspace();
+                        }
+                        vibrateDevice();
+                        return;
+                    }
                     document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    state.activeTool = btn.dataset.tool;
+                    state.activeTool = tool;
                     state.currentPoints = [];
                     vibrateDevice();
                 });
             });
 
-            // OSNAP Master toggle
             document.getElementById('btnOsnapMaster').addEventListener('click', () => {
                 state.osnapEnabled = !state.osnapEnabled;
-                const btn = document.getElementById('btnOsnapMaster');
-                btn.className = state.osnapEnabled 
-                    ? 'px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-bold flex items-center space-x-1'
-                    : 'px-2.5 py-1 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 font-bold flex items-center space-x-1';
                 document.getElementById('osnapMasterText').textContent = state.osnapEnabled ? 'OSNAP: ON' : 'OSNAP: OFF';
                 vibrateDevice();
             });
 
-            // Drawer controls
+            document.querySelectorAll('.osnap-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    const mode = pill.dataset.snap;
+                    state.osnapModes[mode] = !state.osnapModes[mode];
+                    pill.classList.toggle('active', state.osnapModes[mode]);
+                    vibrateDevice();
+                });
+            });
+
             const drawer = document.getElementById('measureDrawer');
             document.getElementById('btnOpenDrawer').addEventListener('click', () => {
                 drawer.classList.remove('hidden');
@@ -798,16 +764,18 @@
                 setTimeout(() => { drawer.classList.add('hidden'); drawer.classList.remove('flex'); }, 300);
             });
 
-            // Scale modal
             const scaleModal = document.getElementById('scaleModal');
             document.getElementById('btnOpenScaleModal').addEventListener('click', () => {
+                document.getElementById('btnApplyPreset').classList.remove('hidden');
+                document.getElementById('btnApply2PtCalib').classList.add('hidden');
                 scaleModal.classList.remove('hidden');
                 scaleModal.classList.add('flex');
             });
             document.getElementById('btnCloseScaleModal').addEventListener('click', () => scaleModal.classList.add('hidden'));
-            document.getElementById('btnSaveScaleModal').addEventListener('click', () => {
+
+            document.getElementById('btnApplyPreset').addEventListener('click', () => {
                 const ratio = parseFloat(document.getElementById('presetScaleSelect').value);
-                state.pixelsPerFoot = (state.canvasPixelsPerPaperInch * 12.0) / ratio;
+                state.pixelsPerFoot = (144.0 * 12.0) / ratio;
                 state.scaleLabel = `Scale 1:${ratio}`;
                 updateTopScaleText();
                 scaleModal.classList.add('hidden');
@@ -818,12 +786,13 @@
                 state.activeTool = 'calibrate';
                 state.currentPoints = [];
             });
-            document.getElementById('btnApplyCalib').addEventListener('click', () => {
+
+            document.getElementById('btnApply2PtCalib').addEventListener('click', () => {
                 const ft = parseFloat(document.getElementById('calibFeet').value) || 0;
                 const inch = parseFloat(document.getElementById('calibInches').value) || 0;
-                const totalFt = ft + (inch / 12.0);
-                if (totalFt > 0 && state.pendingCalibDistPx > 0) {
-                    state.pixelsPerFoot = state.pendingCalibDistPx / totalFt;
+                const totalFeet = ft + (inch / 12.0);
+                if (totalFeet > 0 && state.pendingCalibDistPx > 0) {
+                    state.pixelsPerFoot = state.pendingCalibDistPx / totalFeet;
                     state.scaleLabel = `Calibrated (${ft}'-${inch}")`;
                     updateTopScaleText();
                     scaleModal.classList.add('hidden');
@@ -836,6 +805,16 @@
                 updateDrawerList();
             });
 
+            document.getElementById('btnClearAll').addEventListener('click', () => {
+                if (state.measurements.length > 0) {
+                    state.measurements = [];
+                    state.currentPoints = [];
+                    document.getElementById('badgeCount').textContent = '0';
+                    updateDrawerList();
+                    drawWorkspace();
+                }
+            });
+
             document.getElementById('btnUndo').addEventListener('click', () => {
                 if (state.currentPoints.length > 0) state.currentPoints.pop();
                 else if (state.measurements.length > 0) state.measurements.pop();
@@ -843,25 +822,6 @@
             });
 
             document.getElementById('btnLoadSample').addEventListener('click', generateSampleMobileFloorPlan);
-
-            // PDF Upload Handler
-            document.getElementById('fileInput').addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = async function() {
-                    const typedarray = new Uint8Array(this.result);
-                    const pdfDoc = await pdfjsLib.getDocument({ data: typedarray }).promise;
-                    const page = await pdfDoc.getPage(1);
-                    const viewport = page.getViewport({ scale: 2.0 });
-                    state.planCanvas.width = viewport.width;
-                    state.planCanvas.height = viewport.height;
-                    await page.render({ canvasContext: state.planCanvas.getContext('2d'), viewport }).promise;
-                    state.planLoaded = true;
-                    fitPlanToScreen();
-                };
-                reader.readAsArrayBuffer(file);
-            });
         }
 
         function updateTopScaleText() {
@@ -902,7 +862,7 @@
             });
 
             document.getElementById('drawerTotalLength').textContent = formatLength(totalLen);
-            document.getElementById('drawerTotalArea').textContent = formatArea(totalLen * 2); // Sample estimation
+            document.getElementById('drawerTotalArea').textContent = formatArea(totalLen * 2);
         }
 
         function deleteMeasurement(id) {
